@@ -496,14 +496,21 @@ window.pickChoice=function(i){
   if(!currentEvent)return;
   const c=currentEvent.choices[i];
   applyFx(c.fx);
-  if(c.tag==="mystery"){
-    const win=Math.random()<0.5;
-    setTimeout(()=>{
-      if(win){S.cash+=4000;addLog("🎲 Your gamble paid off: +₦4,000.");}
-      else{addLog("🎲 Your gamble failed. Money gone.");}
-      save();renderGame();
-    },8000);
-  }
+if(c.tag==="mystery"){
+  const win=Math.random()<0.5;
+  scheduleAppt({
+    id:"myst_"+Date.now(),
+    title: win ? "🎲 Your gamble paid off" : "🎲 Your gamble failed",
+    desc: win ? "The bet landed. Come collect." : "The bet didn't land. Lesson learned.",
+    loc: S.location,
+    unlockAt: Date.now()+60000,
+    expiresAt: Date.now()+DAY,
+    reward: win ? {cash:4000} : {happiness:-3},
+    penalty: {},
+    status: "pending"
+  });
+  addLog("🎲 Gamble placed. Result in 60 seconds.");
+}
   addLog(c.res);currentEvent=null;closeModal();save();renderGame();toast(c.res);
 };
 
